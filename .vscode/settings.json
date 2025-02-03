@@ -1,0 +1,12 @@
+{
+  "files.autoSave": "afterDelay",
+  "editor.formatOnSave": true,
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter"
+  },
+  "python.analysis.extraPaths": [
+    "./translate/venv/Lib/site-packages",
+    "./translate/venv/lib/python3.13/site-packages"
+  ],
+  "python.analysis.typeCheckingMode": "standard"
+}
