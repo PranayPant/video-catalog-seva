@@ -1,3 +1,5 @@
 FROM koyeb/docker-compose
 
 COPY . /app
+
+CMD ["docker-compose", "-f", "compose.prod.yaml", "up"]
