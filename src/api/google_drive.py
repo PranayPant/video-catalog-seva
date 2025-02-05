@@ -18,7 +18,7 @@ credentials = service_account.Credentials.from_service_account_file(
 drive_service = build("drive", "v3", credentials=credentials)
 
 
-def update_file_google_drive(params: FileUpdateRequest) -> dict:
+def update_file_google_drive(params) -> dict:
     text, file_id, properties, file_name = (
         params.text,
         params.file_id,
@@ -51,7 +51,7 @@ def update_file_google_drive(params: FileUpdateRequest) -> dict:
     return {"file_id": file.get("id")}
 
 
-def upload_to_google_drive(params: FileUploadRequest) -> dict:
+def upload_to_google_drive(params) -> dict:
 
     text, file_name, properties = params.text, params.file_name, params.properties
 

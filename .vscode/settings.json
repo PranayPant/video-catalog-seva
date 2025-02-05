@@ -5,8 +5,8 @@
     "editor.defaultFormatter": "ms-python.black-formatter"
   },
   "python.analysis.extraPaths": [
-    "./translate/venv/Lib/site-packages",
-    "./translate/venv/lib/python3.13/site-packages"
+    "./venv/Lib/site-packages",
+    "./venv/lib/python3.11/site-packages"
   ],
   "python.analysis.typeCheckingMode": "standard"
 }
