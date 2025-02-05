@@ -3,8 +3,6 @@ from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 
-from ..custom_types import FileUploadRequest, FileUpdateRequest
-
 SCOPES = ["https://www.googleapis.com/auth/drive"]
 SERVICE_ACCOUNT_FILE = "./service-account.secret.json"
 
@@ -33,8 +31,7 @@ def update_file_google_drive(params: FileUpdateRequest) -> dict:
             with open(temp_file_path, "w") as f:
                 f.write(text)
         file_metadata = {"properties": properties}
-        media = MediaFileUpload(
-            temp_file_path, mimetype="text/plain") if text else None
+        media = MediaFileUpload(temp_file_path, mimetype="text/plain") if text else None
         file = (
             drive_service.files()
             .update(fileId=file_id, body=file_metadata, media_body=media)
