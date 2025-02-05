@@ -1,7 +1,7 @@
 import os
 import requests
 
-from ..utils import handle_exceptions
+from ..decorators import handle_exceptions
 from ..custom_types import TranscriptSentence
 
 

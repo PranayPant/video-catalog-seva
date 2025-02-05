@@ -5,16 +5,20 @@ from ..custom_types import (
     TranscriptSentence,
     SearchMediaLocation,
 )
-from ..utils import profile_execution_time
+from ..decorators import handle_exceptions, profile_execution_time, decorate_all_methods
 
 
+@decorate_all_methods(profile_execution_time)
+@decorate_all_methods(handle_exceptions)
 class GenAI:
-    def __init__(self):
+
+    DEFAULT_MODEL_NAME = "gemini-2.0-flash-exp"
+
+    def __init__(self, model_name: str | None = None) -> None:
         self.model = genai.GenerativeModel(
-            model_name="gemini-2.0-flash-exp",
+            model_name=model_name or self.DEFAULT_MODEL_NAME,
         )
 
-    @profile_execution_time
     def translate_sentences(
         self, sentences: list[TranscriptSentence]
     ) -> list[TranscriptSentence]:
@@ -49,7 +53,6 @@ class GenAI:
 
         return result
 
-    @profile_execution_time
     def locate_text_in_sentences(
         self, sentences: list[TranscriptSentence], search_term: str
     ) -> list[SearchMediaLocation]:
@@ -59,36 +62,46 @@ class GenAI:
 
         prompt = (
             """
-            You are given an array of sentences and a search term.
-            Go over each sentence and decide how relvant the search term is to the topic of that sentence.
+            You are given an array of sentences and a topic.
 
-            Output an array of relantance scores for each sentence that indicates how relevant the search term is to the topic of that sentence.
-            1 indicates that the search term is highly relevant to the topic of the sentence.
-            0 indicates that the search term is not relevant to the topic of the sentence.
+            Score each sentence based on how relevant it is to the given topic, and provide a justification for each score.
+            The score should be a float between 0 and 1 with two digits precision, 
+            and should indicate what percentage of the sentence content is related to the topic.
 
-            Use this as input:
+            Output an array of strings where each element has the form "score,justification".
+
+            Use the following as input:
+            
             sentences = """
             + str(sentences_texts)
             + """
+            
+            topoic = """
+            + search_term
+            + """"
+
             """
         )
         response = self.model.generate_content(
             contents=prompt,
             generation_config=genai.GenerationConfig(
-                response_mime_type="application/json", response_schema=list[float]
+                response_mime_type="application/json",
+                response_schema=list[str],
             ),
         )
-        relevance_scores = json.loads(response.text)
+        match_info = json.loads(response.text)
         sorted_indices = sorted(
-            range(len(relevance_scores)),
-            key=lambda i: relevance_scores[i],
+            range(len(match_info)),
+            key=lambda i: float(match_info[i].split(",")[0]),
             reverse=True,
         )
         locations = [
             SearchMediaLocation(
                 **sentences[sorted_index].model_dump(include={"start", "end"}),
-                relevance=relevance_scores[sorted_index],
+                relevance=float(match_info[sorted_index].split(",")[0]),
+                justifications=match_info[sorted_index].split(",")[1],
                 search_term=search_term,
+                sentence=sentences[sorted_index].text,
             )
             for sorted_index in sorted_indices
         ]

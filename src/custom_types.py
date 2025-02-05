@@ -13,6 +13,8 @@ class SearchMediaLocation(BaseModel):
     end: int
     relevance: float
     search_term: str
+    sentence: str
+    justifications: str | None = None
 
 
 class SearchMediaResponse(BaseModel):
