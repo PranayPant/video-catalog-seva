@@ -8,7 +8,8 @@ services:
     environment:
       - ASSEMBLYAI_API_KEY=${ASSEMBLYAI_API_KEY}
       - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - GOOGLE_DRIVE_SERVICE_ACCOUNT_CREDENTIALS=${GOOGLE_DRIVE_SERVICE_ACCOUNT_CREDENTIALS}
     develop:
       watch:
-      - action: rebuild
-        path: ./src
+        - action: rebuild
+          path: ./src
