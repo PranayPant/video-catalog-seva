@@ -1,21 +1,25 @@
 import os
+import json
+import base64
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 
 SCOPES = ["https://www.googleapis.com/auth/drive"]
-SERVICE_ACCOUNT_FILE = "./service-account.secret.json"
 
-if not os.path.exists(SERVICE_ACCOUNT_FILE):
-    with open(SERVICE_ACCOUNT_FILE, "w") as f:
-        credentials = os.getenv("GOOGLE_DRIVE_SERVICE_ACCOUNT_CREDENTIALS")
-        f.write(os.getenv("GOOGLE_DRIVE_SERVICE_ACCOUNT_CREDENTIALS") or "")
+try:
+    credentials_base64 = os.getenv("GOOGLE_DRIVE_SERVICE_ACCOUNT_CREDENTIALS") or ""
+    # Decode the Base64 data
+    decoded_data = base64.b64decode(credentials_base64)
+    # Convert the decoded data to a JSON object
+    credentials_info = json.loads(decoded_data)
+    credentials = service_account.Credentials.from_service_account_info(
+        credentials_info, scopes=SCOPES
+    )
+    drive_service = build("drive", "v3", credentials=credentials)
 
-credentials = service_account.Credentials.from_service_account_file(
-    SERVICE_ACCOUNT_FILE, scopes=SCOPES
-)
-
-drive_service = build("drive", "v3", credentials=credentials)
+except Exception as error:
+    print(f"Error creating Google Drive service: {error}")
 
 
 def update_file_google_drive(params) -> dict:
